@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 import "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
+import "hardhat/console.sol";
 
 contract NFTAuction is IERC721Receiver {
     
@@ -109,12 +110,14 @@ contract NFTAuction is IERC721Receiver {
         }
     }
 
-    function executeSale(address _nft, uint256 _tokenId) external {
+    function finishSale(address _nft, uint256 _tokenId) external {
         auctionDetails storage auction = tokenToAuction[_nft][_tokenId];
+        console.log("line 115");
         require(
             auction.duration <= block.timestamp,
             "deadline did not pass yet"
         );
+        console.log("line 118");
         require(auction.seller == msg.sender, "msg.sender is not seller");
         require(auction.isActive, "auction is not alive now.");
         auction.isActive = false;
@@ -147,11 +150,23 @@ contract NFTAuction is IERC721Receiver {
         }
     }
 
-    function cancelAution(address _nft, uint256 _tokenId) external {
+    function stopAuction(address _nft, uint256 _tokenId) public {
         auctionDetails storage auction = tokenToAuction[_nft][_tokenId];
         require(auction.seller == msg.sender, "msg.sender is not seller");
         require(auction.isActive, "auction is not alive now.");
         auction.isActive = false;
+    }
+
+    function resumeAuction(address _nft, uint256 _tokenId) public {
+        auctionDetails storage auction = tokenToAuction[_nft][_tokenId];
+        require(auction.seller == msg.sender, "msg.sender is not seller");
+        require(!auction.isActive, "auction is alive now.");
+        auction.isActive = true;
+    }
+
+    function cancelAution(address _nft, uint256 _tokenId) external {
+        stopAuction(_nft, _tokenId);
+        auctionDetails storage auction = tokenToAuction[_nft][_tokenId];
         bool success;
         for (uint256 i = 0; i < auction.users.length; i++) {
             success = IERC20(auction.tokenAddress).transfer(
@@ -170,6 +185,10 @@ contract NFTAuction is IERC721Receiver {
     {
         auctionDetails memory auction = tokenToAuction[_nft][_tokenId];
         return auction;
+    }
+
+    function ownof(address _nft, uint256 _tokenId) public view returns(address) {
+        return IERC721(_nft).ownerOf(_tokenId);
     }
 
     function onERC721Received(
