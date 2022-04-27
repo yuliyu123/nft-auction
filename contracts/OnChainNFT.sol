@@ -9,7 +9,7 @@ import "hardhat/console.sol";
 contract OnChainNFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
     bool public paused = false;
-    mapping(uint256 => Word) public TokenIdToWords;
+    mapping(uint256 => Word) public tokenIdToWords;
     uint256 public stringLimit = 45;
 
     struct Word {
@@ -43,7 +43,7 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
             );
         }
 
-        TokenIdToWords[newTokenId] = newWord;
+        tokenIdToWords[newTokenId] = newWord;
         _safeMint(msg.sender, newTokenId);
         return newTokenId;
     }
@@ -51,7 +51,7 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
     function exists(string memory _text) public view returns (bool) {
         bool result = false;
         for (uint256 i = 1; i <= totalSupply(); i++) {
-            string memory text = TokenIdToWords[i].value;
+            string memory text = tokenIdToWords[i].value;
             if (
                 keccak256(abi.encodePacked(text)) ==
                 keccak256(abi.encodePacked(_text))
@@ -76,7 +76,7 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
     }
 
     function buildImage(uint256 _tokenId) private view returns (string memory) {
-        Word memory currentWord = TokenIdToWords[_tokenId];
+        Word memory currentWord = tokenIdToWords[_tokenId];
         string memory random = randomNum(361, 3, 3).toString();
         return
             Base64.encode(
@@ -110,7 +110,7 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
         view
         returns (string memory)
     {
-        Word memory currentWord = TokenIdToWords[_tokenId];
+        Word memory currentWord = tokenIdToWords[_tokenId];
         return
             string(
                 abi.encodePacked(
