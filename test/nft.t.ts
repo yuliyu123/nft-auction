@@ -117,12 +117,12 @@ describe("NFT TESTS", function () {
     console.log("onChainNFT.address: ", onChainNFT.address);
     assert.equal(nftAuction.address, await nftAuction.ownof(onChainNFT.address, 1));
 
-    console.log("go forward in time");
+    // console.log("go forward in time");
     // await traveler.advanceTimeAndBlock(TEST_TRAVEL_TIME);
 
     // await nftAuction.connect(alice).finishSale(onChainNFT.address, 1);
     // assert.equal(tom.address, await nftAuction.ownof(onChainNFT.address, 1));
-    
+
     // for (let i = 0; i < accounts.length; ++i) {
     //   assert.equal(1000, await mockToken.balanceOf(accounts[i].address));
     // }
