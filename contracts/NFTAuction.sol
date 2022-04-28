@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
 import "hardhat/console.sol";
 
 contract NFTAuction is IERC721Receiver {
-    
     string private name;
+
     constructor() {
         name = "NFT Auction";
     }
@@ -70,7 +70,10 @@ contract NFTAuction is IERC721Receiver {
         );
         require(auction.isActive, "auction is not alive");
         require(auction.duration > block.timestamp, "deadline already passed");
-        require(msg.sender != address(0) && msg.sender != auction.seller, "bid user is invalid");
+        require(
+            msg.sender != address(0) && msg.sender != auction.seller,
+            "bid user is invalid"
+        );
 
         bool exist = false;
         // check wheather bid, refund old user bid to user
@@ -112,12 +115,10 @@ contract NFTAuction is IERC721Receiver {
 
     function finishSale(address _nft, uint256 _tokenId) external {
         auctionDetails storage auction = tokenToAuction[_nft][_tokenId];
-        console.log("line 115");
         require(
             auction.duration <= block.timestamp,
             "deadline did not pass yet"
         );
-        console.log("line 118");
         require(auction.seller == msg.sender, "msg.sender is not seller");
         require(auction.isActive, "auction is not alive now.");
         auction.isActive = false;
@@ -187,7 +188,11 @@ contract NFTAuction is IERC721Receiver {
         return auction;
     }
 
-    function ownof(address _nft, uint256 _tokenId) public view returns(address) {
+    function ownof(address _nft, uint256 _tokenId)
+        public
+        view
+        returns (address)
+    {
         return IERC721(_nft).ownerOf(_tokenId);
     }
 

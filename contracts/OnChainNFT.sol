@@ -10,6 +10,7 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
     bool public paused = false;
     mapping(uint256 => Word) public tokenIdToWords;
+    mapping(address => uint256[]) userToTokenIds;
     uint256 public stringLimit = 45;
 
     struct Word {
@@ -44,6 +45,7 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
         }
 
         tokenIdToWords[newTokenId] = newWord;
+        userToTokenIds[msg.sender].push(newTokenId);
         _safeMint(msg.sender, newTokenId);
         return newTokenId;
     }
@@ -152,6 +154,11 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
             "ERC721Metadata: URI query for nonexistent token"
         );
         return buildMetadata(_tokenId);
+    }
+
+    function getUserTokenIds() public view returns (uint256[] memory) {
+        require(msg.sender != address(0), "user address can't be zero");
+        return userToTokenIds[msg.sender];
     }
 
     function withdraw() public payable onlyOwner {

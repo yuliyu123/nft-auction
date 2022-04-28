@@ -6,10 +6,7 @@ import { OnChainNFT } from '../typechain/OnChainNFT';
 import { NFTAuction } from '../typechain/NFTAuction';
 import { MockERC20 } from '../typechain/MockERC20';
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-// var Web3 = require("web3");
-// var web3 = new Web3(Web3.givenProvider || "http://127.0.0.1:8545");
 
-const traveler = require("ganache-time-traveler");
 const TEST_TRAVEL_TIME = 3600 * 2; // 2 hours
 
 let deployer: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddress,
@@ -17,6 +14,7 @@ let deployer: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddres
 let onChainNFT: OnChainNFT;
 let nftAuction: NFTAuction;
 let mockToken: MockERC20;
+let tokenId: number;
 
 before(async function () {
   accounts = (await ethers.getSigners()).slice(0, 5);;
@@ -26,23 +24,10 @@ before(async function () {
   nftAuction = await new NFTAuction__factory(deployer).deploy();
 });
 
-// let advanceTimeAndBlock = async (time: any) => {
-//   //capture current time
-//   let block = await web3.eth.getBlock('latest')
-//   let forwardTime = block['timestamp'] + time
-
-//   return new Promise((resolve, reject) => {
-//     web3.currentProvider.send({
-//       jsonrpc: '2.0',
-//       method: 'evm_mine',
-//       params: [forwardTime],
-//       id: new Date().getTime()
-//     }, (err: any, result: any) => {
-//       if (err) { return reject(err) }
-//       return resolve(result)
-//     })
-//   })
-// }
+const advanceTimeAndBlock = (async function (time: number) {
+  let block = await ethers.provider.getBlock('latest');
+  await ethers.provider.send("evm_mine", [block['timestamp'] + time]);
+});
 
 describe("NFT TESTS", function () {
   it("Case #1 - should mint and transfer to alice success", async function () {
@@ -73,7 +58,7 @@ describe("NFT TESTS", function () {
 
   it("Case #4 - tom should be the auction winner", async function () {
     const nftAddress = onChainNFT.address;
-    const duration = await (await ethers.provider.getBlock(1)).timestamp + TEST_TRAVEL_TIME;
+    const duration = await (await ethers.provider.getBlock(('latest'))).timestamp + TEST_TRAVEL_TIME;
 
     assert.equal(alice.address, await nftAuction.ownof(onChainNFT.address, 1));
 
@@ -82,49 +67,54 @@ describe("NFT TESTS", function () {
       await mockToken.connect(accounts[i]).approve(nftAuction.address, 1000);
     }
 
+    let tokenIds = await onChainNFT.connect(alice).getUserTokenIds();
+    tokenId = tokenIds[0].toNumber();
+
     // approve & create auction
-    await onChainNFT.connect(alice).approve(nftAuction.address, 1);
-    await nftAuction.connect(alice).createTokenAuction(nftAddress, 1, mockToken.address, 1, duration);
+    await onChainNFT.connect(alice).approve(nftAuction.address, tokenId);
+    await nftAuction.connect(alice).createTokenAuction(nftAddress, tokenId, mockToken.address, 1, duration);
 
     // start bid
-    await nftAuction.connect(bob).bid(nftAddress, 1, 2);
-    await nftAuction.connect(frank).bid(nftAddress, 1, 3);
-    await nftAuction.connect(bob).bid(nftAddress, 1, 4);
-    await nftAuction.connect(tom).bid(nftAddress, 1, 5);
-    await nftAuction.connect(frank).bid(nftAddress, 1, 19);
-    await nftAuction.connect(bob).bid(nftAddress, 1, 19);
-    await nftAuction.connect(bob).bid(nftAddress, 1, 100);
-    await nftAuction.connect(tom).bid(nftAddress, 1, 200);
+    await nftAuction.connect(bob).bid(nftAddress, tokenId, 2);
+    await nftAuction.connect(frank).bid(nftAddress, tokenId, 3);
+    await nftAuction.connect(bob).bid(nftAddress, tokenId, 4);
+    await nftAuction.connect(tom).bid(nftAddress, tokenId, 5);
+    await nftAuction.connect(frank).bid(nftAddress, tokenId, 19);
+    await nftAuction.connect(bob).bid(nftAddress, tokenId, 19);
+    await nftAuction.connect(bob).bid(nftAddress, tokenId, 100);
+    await nftAuction.connect(tom).bid(nftAddress, tokenId, 200);
 
-    const auctionDetail = await nftAuction.getTokenAuctionDetails(nftAddress, 1);
+    const auctionDetail = await nftAuction.getTokenAuctionDetails(nftAddress, tokenId);
     assert.equal(tom.address, await auctionDetail.maxBidUser);
-    assert.equal(nftAuction.address, await nftAuction.ownof(onChainNFT.address, 1));
+    assert.equal(nftAuction.address, await nftAuction.ownof(onChainNFT.address, tokenId));
   });
 
   it("Case #5 - stop and resume auction", async function () {
-    await nftAuction.connect(alice).stopAuction(onChainNFT.address, 1);
+    await nftAuction.connect(alice).stopAuction(onChainNFT.address, tokenId);
 
-    let auctionDetail = await nftAuction.getTokenAuctionDetails(onChainNFT.address, 1);
+    let auctionDetail = await nftAuction.getTokenAuctionDetails(onChainNFT.address, tokenId);
     assert.equal(false, await auctionDetail.isActive);
 
-    await nftAuction.connect(alice).resumeAuction(onChainNFT.address, 1);
-    auctionDetail = await nftAuction.getTokenAuctionDetails(onChainNFT.address, 1);
+    await nftAuction.connect(alice).resumeAuction(onChainNFT.address, tokenId);
+    auctionDetail = await nftAuction.getTokenAuctionDetails(onChainNFT.address, tokenId);
     assert.equal(true, await auctionDetail.isActive);
   });
 
   it("Case #6 - auction success", async function () {
-    console.log("nftAuction.address: ", nftAuction.address);
-    console.log("onChainNFT.address: ", onChainNFT.address);
-    assert.equal(nftAuction.address, await nftAuction.ownof(onChainNFT.address, 1));
+    assert.equal(nftAuction.address, await nftAuction.ownof(onChainNFT.address, tokenId));
+    assert.equal(10000, await mockToken.balanceOf(alice.address));
+    assert.equal(9900, await mockToken.balanceOf(bob.address));
+    assert.equal(9981, await mockToken.balanceOf(frank.address));
+    assert.equal(9800, await mockToken.balanceOf(tom.address));
 
-    // console.log("go forward in time");
-    // await traveler.advanceTimeAndBlock(TEST_TRAVEL_TIME);
+    console.log("go forward in time");
+    await advanceTimeAndBlock(TEST_TRAVEL_TIME);
+    await nftAuction.connect(alice).finishSale(onChainNFT.address, 1);
 
-    // await nftAuction.connect(alice).finishSale(onChainNFT.address, 1);
-    // assert.equal(tom.address, await nftAuction.ownof(onChainNFT.address, 1));
-
-    // for (let i = 0; i < accounts.length; ++i) {
-    //   assert.equal(1000, await mockToken.balanceOf(accounts[i].address));
-    // }
+    assert.equal(tom.address, await nftAuction.ownof(onChainNFT.address, 1));
+    assert.equal(10200, await mockToken.balanceOf(alice.address));
+    assert.equal(10000, await mockToken.balanceOf(bob.address));
+    assert.equal(10000, await mockToken.balanceOf(frank.address));
+    assert.equal(9800, await mockToken.balanceOf(tom.address));
   });
 });
