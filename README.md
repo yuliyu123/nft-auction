@@ -1,5 +1,5 @@
 ## Overview
-NFT auction is a dapp that support onchain nft mint and store NFT onchain. Users also can create auctions diretcly after mint their own NFT successfully.
+NFT auction is a dapp that support onchain nft mint and store NFT onchain. Users also can create auctions directly after mint their own NFT successfully.
 It's also support multiple users create auctions, start bid at the same time and also support standard ERC20 token as trade token.
 
 ## Installation
