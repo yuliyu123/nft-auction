@@ -1,46 +1,43 @@
-# Advanced Sample Hardhat Project
+## Overview
+NFT auction is a dapp that support onchain nft mint and store NFT onchain. Users also can create auctions diretcly after mint their own NFT successfully.
+It's also support multiple users create auctions, start bid at the same time and also support standard ERC20 token as trade token.
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
+## Installation
 
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.ts
-TS_NODE_FILES=true npx ts-node scripts/deploy.ts
-npx eslint '**/*.{js,ts}'
-npx eslint '**/*.{js,ts}' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+```bash
+https://github.com/yuliyu123/nft-auction.git
+cd nft-auction
+yarn install
 ```
 
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/deploy.ts
+## Run tests & deploy
+```bash
+yarn build
+yarn test
+yarn coverage
+yarn deploy
 ```
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
+## Coverage
+```bash
+------------------|----------|----------|----------|----------|----------------|
+File              |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+------------------|----------|----------|----------|----------|----------------|
+ contracts/       |    91.49 |    54.55 |    94.74 |    91.49 |                |
+  NFTAuction.sol  |     87.5 |       56 |       90 |     87.5 |... 173,177,179 |
+  OnChainNFT.sol  |      100 |       50 |      100 |      100 |                |
+ contracts/Mocks/ |      100 |      100 |      100 |      100 |                |
+  MockERC20.sol   |      100 |      100 |      100 |      100 |                |
+------------------|----------|----------|----------|----------|----------------|
+All files         |    91.58 |    54.55 |       95 |    91.58 |                |
+------------------|----------|----------|----------|----------|----------------|
 ```
 
-# Performance optimizations
+## MIT License
+Copyright 2022 [pks](looperx95@gmail.com)
 
-For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
