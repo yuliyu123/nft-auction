@@ -50,6 +50,20 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
         return newTokenId;
     }
 
+    function tokenURI(uint256 _tokenId)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        require(
+            _exists(_tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
+        return buildMetadata(_tokenId);
+    }
+
     function exists(string memory _text) public view returns (bool) {
         bool result = false;
         for (uint256 i = 1; i <= totalSupply(); i++) {
@@ -140,20 +154,6 @@ contract OnChainNFT is ERC721Enumerable, Ownable {
                     )
                 )
             );
-    }
-
-    function tokenURI(uint256 _tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
-        require(
-            _exists(_tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
-        return buildMetadata(_tokenId);
     }
 
     function getUserTokenIds() public view returns (uint256[] memory) {
