@@ -7,8 +7,9 @@
     "build": "hardhat compile",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "deploy": "npm run build && RELEASE_VERSION=v1 npx truffle --network goerli exec scripts/deploy.js"
+    "deploy": "hardhat run scripts/deploy.ts --network rinkeby"
   },
+  "author": "pks",
   "license": "MIT",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",

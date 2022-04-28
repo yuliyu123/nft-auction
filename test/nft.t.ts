@@ -10,7 +10,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 const TEST_TRAVEL_TIME = 3600 * 2; // 2 hours
 
 let deployer: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddress,
-  frank: SignerWithAddress, tom: SignerWithAddress, accounts: SignerWithAddress[];;
+  frank: SignerWithAddress, tom: SignerWithAddress, accounts: SignerWithAddress[];
 let onChainNFT: OnChainNFT;
 let nftAuction: NFTAuction;
 let mockToken: MockERC20;
