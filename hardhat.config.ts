@@ -7,7 +7,7 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 
-require("dotenv").config({path: ".env"});
+require("dotenv").config({ path: ".env" });
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -30,16 +30,15 @@ const config: HardhatUserConfig = {
   networks: {
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
-      accounts: [`${PRIVATE_KEY}`],
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
-     mainnet: {
+    mainnet: {
       url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
-      accounts: [`${PRIVATE_KEY}`],
+      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
     },
   },
   gasReporter: {
